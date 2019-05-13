@@ -470,27 +470,18 @@ if( !class_exists('Activate') ) {
      		'view_courses'  => true,
      		'view_departments'  => true,
      		'view_programs'  => true,
-     		'view_students'  => true,
+     		'view_students'  => true
     	));
 
     	add_role('faculty', 'Faculty', array(
     		'read' => true,
-    		'view_enrolled_students' => true,
-    		'view_course_syllabus' => true,
-    		'update_course_syllabus' => true,
-      	'view_faculties'  => true,
-      	'view_faculty_qualification'  => true,
-     		'view_faculty_experience' => true,
-     		'view_courses'  => true,
-     		'view_departments'  => true,
-     		'view_programs'  => true,
-     		'approve_semester_registration'  => true,
+				'approve_semester_registration'  => true
     	 ));
 
 			//This is the role that has access of the Wordpress admin dashboard
 			$adminRole = get_role('administrator');
 			$adminRole->add_cap( 'add_department', true );
-			$adminRole->add_cap( 'update_department', true );
+			$adminRole->add_cap( 'update_department', tru );
 			$adminRole->add_cap( 'add_course_types', true );
 			$adminRole->add_cap( 'add_course', true );
 			$adminRole->add_cap( 'add_curriculum', true );
@@ -550,13 +541,13 @@ if( !class_exists('Activate') ) {
 				(FacultyRegistrationMappingID, FacultyID, SemesterID, ProgramID, DepartmentID) VALUES (1, 1, 2, 3, 4);";
 			$wpdb->query($insertsql);
 
-			/*$insertsql = "INSERT INTO {$wpdb->prefix}acad_enrollment
+			$insertsql = "INSERT INTO {$wpdb->prefix}acad_enrollment
 				(EnrollmentID, StudentEnrollmentNumber, SemesterID, CourseID, IsCurrentlyEnrolled, IsApproved, IsDetained, IsBacklog, CourseGrade) VALUES(1, 141603002, 2, 11, 1, 0, 0, 0, 0), (2, 141603002, 2, 12, 1, 0, 0, 0, 0), (3, 141603002, 2, 10, 1, 0, 0, 0, 0), (4, 141603003, 2, 11, 1, 0, 0, 0, 0), (5, 141603003, 2, 12, 1, 0, 0, 0, 0), (6, 141603003, 2, 10, 1, 0, 0, 0, 0), (7, 141603004, 2, 12, 1, 0, 0, 0, 0), (8, 141603004, 2, 11, 1, 0, 0, 0, 0), (9, 141603004, 2, 10, 1, 0, 0, 0, 0); ";
 			$wpdb->query($insertsql);
 
 			$insertsql = "INSERT INTO {$wpdb->prefix}acad_semester_registration
-				(RegistrationID, FacultyRegistrationMappingID, StudentEnrollmentNumber, RegistrationDate, RegistrationStatus, CreditsTaken) VALUES (1, 1, 141603002, 2019-05-13, 'Pending', 9), (2, 1, 141603003, 2019-05-13, 'Pending', 9), (3, 1, 141603004, 2019-05-13, 'Pending', 9); ";
-			$wpdb->query($insertsql); */
+				(RegistrationID, FacultyRegistrationMappingID, StudentEnrollmentNumber, RegistrationDate, RegistrationStatus, CreditsTaken) VALUES (1, 1, 141603002, '2019-05-13', 'Pending', 9), (2, 1, 141603003, '2019-05-13', 'Pending', 9), (3, 1, 141603004, '2019-05-13', 'Pending', 9); ";
+			$wpdb->query($insertsql);
 		}
 
 	}

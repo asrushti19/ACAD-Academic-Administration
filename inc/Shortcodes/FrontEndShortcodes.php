@@ -183,11 +183,114 @@ class FrontEndShortcodes {
   }
 
   public function semesterRegistrationApproval() {
-    if( current_user_can('approve_semester_registration') ) {
-        echo "Inside functionn ";
+
+    $current_user = wp_get_current_user();
+    $faculty_id = $current_user->user_login;
+    global $wpdb;
+
+    if($_POST) {
+
+      $enrollment_table = $wpdb->prefix . 'acad_enrollment';
+      $reg_table = $wpdb->prefix . 'acad_semester_registration';
+      $student_table = $wpdb->prefix . 'acad_student';
+
+      /*
+      Approve registrations of one or more students.
+      Set semesterRegistration->RegistrationStatus = Approved and enrollment -> IsCurrentlyEnrolled = true
+      */
+      if( $_POST['Approve'] ) {
+        foreach ($_POST as $record => $value) {
+          if( $record != "Approve") {
+            $wpdb->query( "UPDATE $enrollment_table SET IsApproved = 1 WHERE StudentEnrollmentNumber = ". $value );
+            $wpdb->query( "UPDATE $reg_table SET RegistrationStatus = 'Approved' WHERE StudentEnrollmentNumber = ". $value );
+          }
+        }
+        echo "Approved successfully";
+      }
+
+      /*
+      View details of a single student's registration
+      */
+      if( $_POST['View'] ) {
+        foreach ($_POST as $student => $value) {
+          if( $student != "View" ) {
+            $id = $value;
+            $rows = $wpdb->get_results( "SELECT FirstName, MiddleName, LastName, SemesterID, CourseID, IsCurrentlyEnrolled, IsApproved, IsDetained, IsBacklog, CourseGrade, CreditsTaken FROM $enrollment_table, $reg_table, $student_table WHERE $enrollment_table.StudentEnrollmentNumber = ". $value . " AND $reg_table.StudentEnrollmentNumber = ". $value ." AND $student_table.StudentEnrollmentNumber = ". $value );
+
+            $course_ids = array();
+            foreach ($rows as $row => $value) {
+              array_push( $course_ids, $value->CourseID );
+            }
+
+            $format = implode(',', $course_ids);
+
+            //get course names from course ids
+            $course_table = $wpdb->prefix . 'acad_course';
+            $courses = $wpdb->get_results( "SELECT CourseName, CourseCredits FROM $course_table WHERE CourseID IN ($format)" );
+
+            echo '<table border=0><tr><th>Student Enrollment Number : </th><td>'.$id.'</td></tr><tr><th>Student Name:</th><td>'.$rows[0]->FirstName.' '. $rows[0]->MiddleName.' '. $rows[0]->LastName .'</td></tr></table>';
+
+            //Display all the details in a table
+            echo '<table border = 0><th>Course Name</th><th>Course Credits</th><th>IsBacklog</th><th>IsDetained</th></tr>';
+
+            foreach ($courses as $course => $v) {
+              echo '<tr><td>'. $v->CourseName.'</td><td>'. $v->CourseCredits.'</td><td>'.$rows[0]->IsBacklog.'</td><td>' . $rows[0]->IsDetained.'</td></tr>';
+            }
+
+            echo '<tr></table><table border = 0><th>Credits Taken : </th><td>'. $rows[0]->CreditsTaken.'</td></table></tr><tr><td><form method="post"><input type="hidden" name="'.$id.'" value="'.$id.'"><input type="submit" name="Approve" value="Approve"></form></td></tr></table>';
+          }
+        }
+      }
     }
     else {
-      echo "You are not authorized to view this page";
+      //show a list of classes
+      $mappings_table = $wpdb->prefix . 'acad_faculty_registration_mapping';
+      $mappings = $wpdb->get_results( "SELECT FacultyRegistrationMappingID FROM $mappings_table WHERE FacultyID = $faculty_id" );
+
+      $ids_array = array();
+      foreach ($mappings as $mapping => $value) {
+        array_push( $ids_array, intval($value->FacultyRegistrationMappingID) );
+      }
+
+      $format = implode(',', $ids_array);
+      $reg_table = $wpdb->prefix . 'acad_semester_registration';
+      $registrations = $wpdb->get_results( "SELECT * FROM $reg_table WHERE FacultyRegistrationMappingID IN ($format)" );
+
+      echo '<form method="post"><table border="0"><tr><th>Student Enrollment Number</th><th>Student Name</th><th>Department</th><th>Total Credits</th><th>Backlogs</th><th>Detained</th><th>Status</th><th>Approve</th><th>View</th></tr>';
+
+
+      $enrollment_table = $wpdb->prefix . 'acad_enrollment';
+      $department_table = $wpdb->prefix . 'acad_department';
+      $program_table = $wpdb->prefix .'acad_program';
+      $student_table = $wpdb->prefix . 'acad_student';
+
+      foreach ($registrations as $registration => $value) {
+        $backlogs = 0;
+        $detained = 0;
+
+        //get all the courses that the student has registered for
+        $enrollments = $wpdb->get_results( "SELECT IsBacklog, IsDetained FROM $enrollment_table WHERE StudentEnrollmentNumber = ". $value->StudentEnrollmentNumber );
+
+        $student_details = $wpdb->get_results( "SELECT FirstName, MiddleName, LastName, $student_table.ProgramID, DepartmentName FROM $student_table, $department_table, $program_table WHERE $student_table.StudentEnrollmentNumber = ". $value->StudentEnrollmentNumber. " AND $student_table.ProgramID = $program_table.ProgramID AND $program_table.DepartmentID = $department_table.DepartmentID" );
+
+        //check for any backlogs or detention in all the courses
+        foreach ($enrollments as $enrollment => $val) {
+          if( $val->IsBacklog == 1 )
+            $backlogs += 1;
+          if( $val->IsDetained == 1)
+            $detained ="Yes";
+        }
+
+        /*
+        Putting this constraint enables us to get only fresh records from this semester for approval.
+        */
+
+        if($value->RegistrationStatus == "Pending") {
+          echo '<tr><form method="post"><td>'. $value->StudentEnrollmentNumber. '</td><td>'.$student_details[0]->FirstName .' '.$student_details[0]->MiddleName.' '.$student_details[0]->LastName.'</td><td>'.$student_details[0]->DepartmentName.'</td><td>'.$value->CreditsTaken .'</td><td>'. $backlogs .'</td><td>' .$detained. '</td><td>'.$value->RegistrationStatus.'</td><td><input type="checkbox" name="'.$value->StudentEnrollmentNumber.'" value="'.$value->StudentEnrollmentNumber.'"></td><td><input type="submit" name="View" value="View"><input type="hidden" name="'.$value->StudentEnrollmentNumber.'" value="'.$value->StudentEnrollmentNumber.'"></td></form></tr>';
+        }
+      }
+
+      echo '<tr><td><input type="submit" name="Approve" value="Approve"></td></tr></table></form>';
     }
   }
 
