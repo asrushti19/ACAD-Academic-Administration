@@ -1,0 +1,17 @@
+{
+    "name": "acad/acad-plugin",
+    "description": "Enable easy administration of Academic Institutes",
+    "type": "project",
+    "license": "GPL",
+    "authors": [
+        {
+            "name": "Srushti Chaudhari",
+            "email": "asrushti19@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {},
+    "autoload": {
+        "psr-4": {"Inc\\": "./inc"}
+    }
+}
