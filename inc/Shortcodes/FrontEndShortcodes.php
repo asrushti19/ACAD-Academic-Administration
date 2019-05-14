@@ -48,137 +48,147 @@ class FrontEndShortcodes {
   }
 
   public function semesterRegistration() {
-    if( current_user_can('enroll_course') ) {
 
-      //get the details of the currently logged in student
-      $current_user = wp_get_current_user();
-      $studentEnrollmentNumber = $current_user->user_login;
+    //get the details of the currently logged in student
+    $current_user = wp_get_current_user();
+    $studentEnrollmentNumber = $current_user->user_login;
 
-      if( $_POST ) {
-        //Insert data into database
+    if( $_POST ) {
+      //Insert data into database
 
-        global $wpdb;
+      global $wpdb;
 
-        $semester_id = $_POST["SemesterID"];
-        $semester_number = $_POST["SemesterNumber"];
+      $semester_id = $_POST["SemesterID"];
+      $semester_number = $_POST["SemesterNumber"];
 
-        $total_credits = 0;
+      $total_credits = 0;
 
-        //get the courseIDs from POST data and save in the database
-        foreach ($_POST as $course => $id) {
-          if( $course != "submit" && $course != "SemesterID" && $course != "SemesterNumber" && $course != "ProgramID" && $course != "DepartmentID" && $course != "CourseCredits" ) {
+      //get the courseIDs from POST data and save in the database
+      foreach ($_POST as $course => $id) {
+        if( $course != "submit" && $course != "SemesterID" && $course != "SemesterNumber" && $course != "ProgramID" && $course != "DepartmentID" && $course != "CourseCredits" ) {
 
-            $is_detained = 0;
-            $is_backlog = 0;
-            $course_grade = 0;
+          $is_detained = 0;
+          $is_backlog = 0;
+          $course_grade = 0;
 
-            $id_credits = explode("_", $id);
-            $total_credits += $id_credits[1];
+          $id_credits = explode("_", $id);
+          $total_credits += $id_credits[1];
 
-            $insertsql = "INSERT INTO {$wpdb->prefix}acad_enrollment
-            (StudentEnrollmentNumber, SemesterID, CourseID, IsCurrentlyEnrolled, IsApproved, IsDetained, IsBacklog, CourseGrade) VALUES ($studentEnrollmentNumber, $semester_id, $id_credits[0], 1, 0, $is_detained, $is_backlog, $course_grade );";
-            $wpdb->query($insertsql);
-          }
-        }
-        /*
-        insert registration data into acad_student_registration
-        */
-
-        //get the FacultyRegistrationMappingID
-        $faculty_table = $wpdb->prefix . 'acad_faculty_registration_mapping';
-        $mapping = $wpdb->get_results( "SELECT FacultyRegistrationMappingID FROM $faculty_table WHERE DepartmentID = ". $_POST['DepartmentID']. " AND ProgramID = ". $_POST['ProgramID']. " AND SemesterID = ". $semester_id );
-
-        $current_date =  date("Y-m-d");
-        $map_id = intval( $mapping[0]->FacultyRegistrationMappingID);
-
-        $insertsql = "INSERT INTO {$wpdb->prefix}acad_semester_registration (FacultyRegistrationMappingID, StudentEnrollmentNumber, RegistrationDate, RegistrationStatus, CreditsTaken) VALUES ( $map_id, $studentEnrollmentNumber, '$current_date', 'Pending', $total_credits); ";
-        $wpdb->query($insertsql);
-
-        echo "Registration saved successfully!";
-      }
-      else {
-        //display registration form
-        global $wpdb;
-        /*
-        Select the program associated with the department of the currently logged in user
-        */
-
-        //get current program from student
-        $student_table = $wpdb->prefix . 'acad_student';
-        $program = $wpdb->get_results( "SELECT ProgramID FROM $student_table WHERE StudentEnrollmentNumber = $studentEnrollmentNumber" );
-
-        if( $program[0]->ProgramID ) {
-          //get the curriculum associated with the program
-          $program_table = $wpdb->prefix . 'acad_program';
-
-          $curriculum = $wpdb->get_results( "SELECT CurriculumID, DepartmentID FROM $program_table WHERE ProgramID =" .  $program[0]->ProgramID );
-
-          //get active semester for that program.
-          $semester_table = $wpdb->prefix . 'acad_semester';
-          $semester = $wpdb->get_results( "SELECT SemesterID, SemesterNumber FROM $semester_table WHERE ProgramID = " . $program[0]->ProgramID  );
-
-          if( $semester[0]->SemesterNumber && $curriculum[0]->CurriculumID ) {
-
-            //get the courses associated with this student from the CourseCurriculumMapping table
-            $course_curriculum_mapping_table = $wpdb->prefix . 'acad_course_curriculum_mapping';
-            $course_ids = $wpdb->get_results( "SELECT CourseID FROM $course_curriculum_mapping_table WHERE CurriculumID = " . $curriculum[0]->CurriculumID ." AND SemesterNumber = " . $semester[0]->SemesterNumber );
-
-            if( $course_ids[0]->CourseID ) {
-              $ids = array();
-              foreach ($course_ids as $course_id) {
-                array_push($ids, abs( intval( $course_id->CourseID ) ));
-              }
-
-              $format = implode(',', $ids);
-
-              //get courses from course table
-              $course_table = $wpdb->prefix . 'acad_course';
-              $courses = $wpdb->get_results( "SELECT * FROM $course_table WHERE CourseID IN ($format)" );
-
-              if( !isset( $courses ) ) {
-                echo "No courses found";
-                return;
-              }
-
-              $course_types_table = $wpdb->prefix . 'acad_course_types';
-              $course_types = $wpdb->get_results( "SELECT * FROM $course_types_table" );
-
-              if(!$course_types) {
-                echo "error in getting course types";
-                return;
-              }
-
-              echo '<table border=1>';
-
-              foreach( $course_types as $course_type) {
-
-                echo '<table border=0><thead><b>'. $course_type->CourseTypeName.'</b></thead><form method="post"><table border=0><th>Course Name</th><th>Course Credits</th><th>Select</th>';
-                foreach ($courses as $course => $value ) {
-                  if($value->CourseTypeID == $course_type->CourseTypeID) {
-                    echo '<tr><td>';
-                    print_r($value->CourseName);
-                    echo '</td>';
-                    echo '<td><label>'.$value->CourseCredits.'</label></td><td><input type="checkbox" name="'. $value->CourseName .'"value="'. $value->CourseID.'_'.$value->CourseCredits.'"></td>';
-                  }
-
-                }
-                echo '</table>';
-              }
-              echo '<input type="hidden" name="SemesterID" value="'. $semester[0]->SemesterID .'">';
-              echo '<input type="hidden" name="SemesterNumber" value="'. $semester[0]->SemesterNumber .'">';
-              echo '<input type="hidden" name="DepartmentID" value="'. $curriculum[0]->DepartmentID .'">';
-              echo '<input type="hidden" name="ProgramID" value="'. $program[0]->ProgramID .'">';
-              echo '<input type="submit" value="Save Changes" name="submit">';
-              $flag = 1;
-              echo '</form></table>';
-            }
-          }
+          $insertsql = "INSERT INTO {$wpdb->prefix}acad_enrollment
+          (StudentEnrollmentNumber, SemesterID, CourseID, IsCurrentlyEnrolled, IsApproved, IsDetained, IsBacklog, CourseGrade) VALUES ($studentEnrollmentNumber, $semester_id, $id_credits[0], 1, 0, $is_detained, $is_backlog, $course_grade );";
+          $wpdb->query($insertsql);
         }
       }
+      /*
+      insert registration data into acad_student_registration
+      */
+
+      //get the FacultyRegistrationMappingID
+      $faculty_table = $wpdb->prefix . 'acad_faculty_registration_mapping';
+      $mapping = $wpdb->get_results( "SELECT FacultyRegistrationMappingID FROM $faculty_table WHERE DepartmentID = ". $_POST['DepartmentID']. " AND ProgramID = ". $_POST['ProgramID']. " AND SemesterID = ". $semester_id );
+
+      $current_date =  date("Y-m-d");
+      $map_id = intval( $mapping[0]->FacultyRegistrationMappingID);
+
+      $insertsql = "INSERT INTO {$wpdb->prefix}acad_semester_registration (FacultyRegistrationMappingID, StudentEnrollmentNumber, RegistrationDate, RegistrationStatus, CreditsTaken) VALUES ( $map_id, $studentEnrollmentNumber, '$current_date', 'Pending', $total_credits); ";
+      $wpdb->query($insertsql);
+
+      echo "Registration saved successfully!";
     }
-
     else {
-      echo "You are not authorized to view this page";
+      //display registration form
+      global $wpdb;
+
+      /*
+      Select the program associated with the department of the currently logged in user
+      */
+
+      //get current program from student
+      $student_table = $wpdb->prefix . 'acad_student';
+      $program = $wpdb->get_results( "SELECT ProgramID FROM $student_table WHERE StudentEnrollmentNumber = $studentEnrollmentNumber" );
+
+
+      if( $program[0]->ProgramID ) {
+        //get the curriculum associated with the program
+        $program_table = $wpdb->prefix . 'acad_program';
+
+        $curriculum = $wpdb->get_results( "SELECT CurriculumID, DepartmentID FROM $program_table WHERE ProgramID =" .  $program[0]->ProgramID );
+
+        //get active semester for that program.
+        $semester_table = $wpdb->prefix . 'acad_semester';
+        $semester = $wpdb->get_results( "SELECT SemesterID, SemesterNumber FROM $semester_table WHERE ProgramID = " . $program[0]->ProgramID  );
+
+        /*
+        Check whether the student has already registered for the current semester.
+        A student can be in  a Semester only once, unless detained. So check for any previous entry with same StudnetEnrollmentNumber and SemesterID with IsBacklog = 0 and IsDeained = 0
+        */
+        $enrollment_table = $wpdb->prefix . 'acad_enrollment';
+        $res = $wpdb->get_results( "SELECT EnrollmentID from $enrollment_table WHERE StudentEnrollmentNumber = ".$studentEnrollmentNumber." AND SemesterID = ".$semester[0]->SemesterID ." AND IsDetained = 0 AND IsBacklog = 0" );
+
+        if( $res ) {
+          echo "You have already registered!";
+          return;
+        }
+
+
+
+        if( $semester[0]->SemesterNumber && $curriculum[0]->CurriculumID ) {
+
+          //get the courses associated with this student from the CourseCurriculumMapping table
+          $course_curriculum_mapping_table = $wpdb->prefix . 'acad_course_curriculum_mapping';
+          $course_ids = $wpdb->get_results( "SELECT CourseID FROM $course_curriculum_mapping_table WHERE CurriculumID = " . $curriculum[0]->CurriculumID ." AND SemesterNumber = " . $semester[0]->SemesterNumber );
+
+          if( $course_ids[0]->CourseID ) {
+            $ids = array();
+            foreach ($course_ids as $course_id) {
+              array_push($ids, abs( intval( $course_id->CourseID ) ));
+            }
+
+            $format = implode(',', $ids);
+
+            //get courses from course table
+            $course_table = $wpdb->prefix . 'acad_course';
+            $courses = $wpdb->get_results( "SELECT * FROM $course_table WHERE CourseID IN ($format)" );
+
+            if( !isset( $courses ) ) {
+              echo "No courses found";
+              return;
+            }
+
+            $course_types_table = $wpdb->prefix . 'acad_course_types';
+            $course_types = $wpdb->get_results( "SELECT * FROM $course_types_table" );
+
+            if(!$course_types) {
+              echo "error in getting course types";
+              return;
+            }
+
+            echo '<table border=1>';
+
+            foreach( $course_types as $course_type) {
+
+              echo '<table border=0><thead><b>'. $course_type->CourseTypeName.'</b></thead><form method="post"><table border=0><th>Course Name</th><th>Course Credits</th><th>Select</th>';
+              foreach ($courses as $course => $value ) {
+                if($value->CourseTypeID == $course_type->CourseTypeID) {
+                  echo '<tr><td>';
+                  print_r($value->CourseName);
+                  echo '</td>';
+                  echo '<td><label>'.$value->CourseCredits.'</label></td><td><input type="checkbox" name="'. $value->CourseName .'"value="'. $value->CourseID.'_'.$value->CourseCredits.'"></td>';
+                }
+
+              }
+              echo '</table>';
+            }
+            echo '<input type="hidden" name="SemesterID" value="'. $semester[0]->SemesterID .'">';
+            echo '<input type="hidden" name="SemesterNumber" value="'. $semester[0]->SemesterNumber .'">';
+            echo '<input type="hidden" name="DepartmentID" value="'. $curriculum[0]->DepartmentID .'">';
+            echo '<input type="hidden" name="ProgramID" value="'. $program[0]->ProgramID .'">';
+            echo '<input type="submit" value="Save Changes" name="submit">';
+            $flag = 1;
+            echo '</form></table>';
+          }
+        }
+      }
     }
   }
 
