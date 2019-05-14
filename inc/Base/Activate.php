@@ -454,6 +454,29 @@ if( !class_exists('Activate') ) {
 						ON UPDATE NO ACTION
 			);";
       dbDelta($createsql);
+
+			$createsql = "CREATE TABLE IF NOT EXISTS {$wpdb->prefix}acad_faculty_course_mapping(
+				FacultyCourseMappingID INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
+			  SemesterID INTEGER UNSIGNED NOT NULL,
+			  CourseID INTEGER UNSIGNED NOT NULL,
+			  FacultyID INTEGER UNSIGNED NOT NULL,
+			  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+			  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+			  PRIMARY KEY(FacultyCourseMappingID, SemesterID),
+			  FOREIGN KEY(FacultyID)
+			    REFERENCES Faculty(FacultyID)
+			      ON DELETE NO ACTION
+			      ON UPDATE NO ACTION,
+			  FOREIGN KEY(CourseID)
+			    REFERENCES Course(CourseID)
+			      ON DELETE NO ACTION
+			      ON UPDATE NO ACTION,
+			  FOREIGN KEY(SemesterID)
+			    REFERENCES Semester(SemesterID)
+			      ON DELETE NO ACTION
+			      ON UPDATE NO ACTION
+			);";
+      dbDelta($createsql);
     }
 
 		/*
@@ -548,6 +571,12 @@ if( !class_exists('Activate') ) {
 			$insertsql = "INSERT INTO {$wpdb->prefix}acad_semester_registration
 				(RegistrationID, FacultyRegistrationMappingID, StudentEnrollmentNumber, RegistrationDate, RegistrationStatus, CreditsTaken) VALUES (1, 1, 141603002, '2019-05-13', 'Pending', 9), (2, 1, 141603003, '2019-05-13', 'Pending', 9), (3, 1, 141603004, '2019-05-13', 'Pending', 9); ";
 			$wpdb->query($insertsql);
+
+			$insertsql = "INSERT INTO {$wpdb->prefix}acad_faculty_course_mapping
+				(FacultyCourseMappingID, SemesterID, CourseID, FacultyID) VALUES(1, 1, 1, 1), (2, 1, 10, 1), (3, 1, 11, 1), (4, 1, 12, 1), (5, 1, 15, 1), (6, 1, 16, 1), (7, 1, 17, 1), (8, 1, 18, 1); ";
+			$wpdb->query($insertsql);
+
+
 		}
 
 	}

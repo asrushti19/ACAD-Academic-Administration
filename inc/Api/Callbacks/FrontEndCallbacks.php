@@ -28,6 +28,10 @@ class FrontEndCallbacks extends BaseController {
     return do_shortcode('[semester_registration_approval]');
   }
 
+  public function displayCoursesAssigned() {
+    return do_shortcode('[courses_assigned]');
+  }
+
 }
 
 ?>

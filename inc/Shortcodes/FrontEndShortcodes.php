@@ -294,6 +294,37 @@ class FrontEndShortcodes {
     }
   }
 
+  /*
+  Display the details of all courses assigned to the faculty who is logged in currently.
+  */
+  public function coursesAssigned() {
+    global $wpdb;
+
+    $current_user = wp_get_current_user();
+    $faculty_id = $current_user->user_login;
+
+    $mappings_table = $wpdb->prefix . 'acad_faculty_course_mapping';
+    $course_table = $wpdb->prefix .'acad_course';
+    $course_types_table = $wpdb->prefix . 'acad_course_types';
+    $department_table = $wpdb->prefix . 'acad_department';
+    $curriculum_table = $wpdb->prefix . 'acad_curriculum';
+    $course_curriculum_mapping_table = $wpdb->prefix . 'acad_course_curriculum_mapping';
+
+    $data = $wpdb->get_results( "SELECT $course_table.CourseID, DepartmentName, CourseTypeName, CourseName, CourseCode, CourseAbbreviation, SyllabusCode, IsTheory, SemesterNumber, CourseCredits FROM $course_table LEFT OUTER JOIN $department_table ON $department_table.DepartmentID = $course_table.DepartmentID LEFT OUTER JOIN $course_types_table ON $course_types_table.CourseTypeID = $course_table.CourseTypeID LEFT OUTER JOIN $course_curriculum_mapping_table ON $course_curriculum_mapping_table.CourseID = $course_table.CourseID LEFT OUTER JOIN $mappings_table ON $course_table.CourseID = $mappings_table.CourseID WHERE $mappings_table.FacultyID = ". $faculty_id );
+
+    echo '<table border="0"><tr><th>Course Name</th><th>Course Type</th><th>Deparment Name</th><th>Course Code</th><th>CurriculumCode</th><th>Semester Number</th></tr>';
+
+    foreach ($data as $mapping => $value) {
+
+      //get Curriculum Code for each course
+      $curriculum = $wpdb->get_results( "SELECT CurriculumCode FROM $curriculum_table, $course_curriculum_mapping_table WHERE $curriculum_table.CurriculumID = $course_curriculum_mapping_table.CurriculumID AND $course_curriculum_mapping_table.CourseID = ". intval( $value->CourseID ) );
+
+      echo '<tr><td>'.$value->CourseName.'</td><td>'.$value->CourseTypeName.'</td><td>'.$value->DepartmentName.'</td><td>'.$value->CourseCode.'</td><td>'.$curriculum[0]->CurriculumCode.'</td><td>'.$value->SemesterNumber.'</td></tr>';
+    }
+
+    echo '</table>';
+  }
+
 }
 
 
