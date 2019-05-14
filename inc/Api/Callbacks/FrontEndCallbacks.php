@@ -32,6 +32,10 @@ class FrontEndCallbacks extends BaseController {
     return do_shortcode('[courses_assigned]');
   }
 
+  public function displayEnrolledStudents() {
+    return do_shortcode('[enrolled_students]');
+  }
+  
 }
 
 ?>

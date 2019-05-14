@@ -1,10 +1,9 @@
 (function($) {
   jQuery(document).ready(function($) {
     $('#department_select').on( 'change', function () {
-      console.log("Inside function");
+
       valueSelect = $(this).val();
-      console.log(valueSelect);
-      console.log(ajax_object.ajax_url);
+
       let dropdown = $('#program_select');
       dropdown.empty();
 
@@ -30,10 +29,8 @@
 
   jQuery(document).ready(function($) {
     $('#program_select').on( 'change', function () {
-      console.log("Inside function");
+
       valueSelect = $(this).val();
-      console.log(valueSelect);
-      console.log(ajax_object.ajax_url);
 
       let dropdown = $('#semester_select');
       dropdown.empty();
@@ -58,9 +55,9 @@
   });
   jQuery(document).ready(function($) {
     $('#department_select').on( 'change', function () {
-      console.log("Inside function");
+
       valueSelect = $(this).val();
-      console.log(valueSelect);
+
       console.log(ajax_object.ajax_url);
       let dropdown = $('#faculty_select');
       dropdown.empty();

@@ -130,8 +130,6 @@ class FrontEndShortcodes {
           return;
         }
 
-
-
         if( $semester[0]->SemesterNumber && $curriculum[0]->CurriculumID ) {
 
           //get the courses associated with this student from the CourseCurriculumMapping table
@@ -333,6 +331,58 @@ class FrontEndShortcodes {
     }
 
     echo '</table>';
+  }
+
+  /*
+  Display the details of students enrolled for all courses taken by the logged in faculty
+  */
+  public function enrolledStudents() {
+    global $wpdb;
+
+    //get the id of the currently logged in user
+    $current_user = wp_get_current_user();
+    $faculty_id = $current_user->user_login;
+
+    //Populate a dropdown for selecting out of courses
+    $mappings_table = $wpdb->prefix . 'acad_faculty_course_mapping';
+    $course_table = $wpdb->prefix. 'acad_course';
+
+    $mappings = $wpdb->get_results( "SELECT $course_table.CourseID, CourseName FROM $course_table LEFT OUTER JOIN $mappings_table ON $course_table.CourseID = $mappings_table.CourseID WHERE $mappings_table.FacultyID = ".$faculty_id );
+
+    /*
+    get the SemesterID of the current Semester and pass it as a hidden field.
+    */
+    $semester_table = $wpdb->prefix . 'acad_semester';
+    //get the semester IDs of all the current semesters, irrespesctive of their program.
+    $semester_ids = $wpdb->get_results( "SELECT SemesterID FROM $semester_table WHERE IsCurrent = 1" );
+
+    //Make an integer array to send to the PHP file through JQuery
+    $ids = array();
+    foreach ($semester_ids as $id => $value) {
+      array_push( $ids, intval($value->SemesterID));
+    }
+
+    //pass each semester ID as the value of a hidden field
+    echo '<table border="0"><tr><th>Course : </th><td><form><input type="hidden" name="action" value="get_enrolled_students_for_course">';
+    foreach ($semester_ids as $id => $value) {
+      echo '<input type="hidden" class="course_enrolled_students_select_class" name="semester_ids[]" value="'.$value->SemesterID.'">';
+    }
+
+    echo '<select id="select_course_enrolled_students">';
+    foreach ($mappings as $mapping => $value) {
+      echo '<option value="'.$value->CourseID.'">'.$value->CourseName.'</option>';
+    }
+    echo '</select></td></tr></table>';
+
+    /*
+    Show a table contaning all students from all courses that the faculty is mapped to.
+    JQuery code will hide this table and display this hidden table which will be filled based on the value in the select field.
+    */
+
+    echo '<table border="0" name="enrolled_students_for_course_table" id="enrolled_students_for_course_table" style="visibility: hidden"><tr><th>Student Enrollment Number</th><th>Student Name</th></tr></table>';
+
+    echo '</form>';
+
   }
 
 }

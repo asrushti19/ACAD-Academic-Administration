@@ -31,7 +31,8 @@ class FrontEnd extends BaseController {
       'courses_view' => array( $this->shortcodes, 'viewCourses' ),
       'semester_registration' => array( $this->shortcodes, 'semesterRegistration' ),
       'semester_registration_approval' => array( $this->shortcodes, 'semesterRegistrationApproval' ),
-      'courses_assigned' => array( $this->shortcodes, 'coursesAssigned' )
+      'courses_assigned' => array( $this->shortcodes, 'coursesAssigned' ),
+      'enrolled_students' => array( $this->shortcodes, 'enrolledStudents' )
     );
 
     $this->settings->setShortcodes( $args );
@@ -46,6 +47,7 @@ class FrontEnd extends BaseController {
     $semester_registration_contents = $this->frontend_callbacks->displaySemesterRegistration();
     $semester_registration_approval_contents = $this->frontend_callbacks->displaySemesterRegistrationApproval();
     $courses_assigned_contents = $this->frontend_callbacks->displayCoursesAssigned();
+    $enrolled_students_contents = $this->frontend_callbacks->displayEnrolledStudents();
 
     $args = array(
       array(
@@ -101,7 +103,17 @@ class FrontEnd extends BaseController {
         'post_status' => 'publish',
         'post_author' => 1,
         'guid' => $page_guid
+      ),
+      array(
+        'post_title' => 'Enrolled Students',
+        'post_type' =>'page',
+        'post_name' => 'ACAD Enrolled Students',
+        'post_content' => $enrolled_students_contents,
+        'post_status' => 'publish',
+        'post_author' => 1,
+        'guid' => $page_guid
       )
+
     );
 
     $this->settings->setCustomPages( $args );
