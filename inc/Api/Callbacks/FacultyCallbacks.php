@@ -185,7 +185,7 @@ class FacultyCallbacks extends BaseController {
 
   public function displayPhoto() {
     $value = esc_attr( get_option('photo') );
-    echo '<input type="text" class="regular-text" name="photo" value="' . $value . '" placeholder="Photo">';
+    echo '<input type="file" class="regular-text" name="photo" value="' . $value . '" placeholder="Photo">';
   }
 
   public function displayBankName() {
