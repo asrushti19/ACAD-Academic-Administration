@@ -115,7 +115,7 @@ class FacultyCallbacks extends BaseController {
 
   public function displayCollegEmail() {
     $value = esc_attr( get_option('college_email') );
-    echo '<input type="text" class="regular-text" name="college_email" value="' . $value . '" placeholder="College email">';
+    echo '<input type="email" class="regular-text" name="college_email" value="' . $value . '" placeholder="College email">';
   }
 
   public function displayPersonalEmail() {
