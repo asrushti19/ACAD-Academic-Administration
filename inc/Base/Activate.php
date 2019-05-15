@@ -46,7 +46,7 @@ if( !class_exists('Activate') ) {
     	global $wpdb;
     	global $charset_collate;
       //drop queries are for temporary purpose of developement
-      $wpdb->query("DROP TABLE IF EXISTS {$wpdb->prefix}acad_department");
+      /*$wpdb->query("DROP TABLE IF EXISTS {$wpdb->prefix}acad_department");
 			$wpdb->query("DROP TABLE IF EXISTS {$wpdb->prefix}acad_course_types");
       $wpdb->query("DROP TABLE IF EXISTS {$wpdb->prefix}acad_course");
       $wpdb->query("DROP TABLE IF EXISTS {$wpdb->prefix}acad_curriculum");
@@ -59,7 +59,7 @@ if( !class_exists('Activate') ) {
       $wpdb->query("DROP TABLE IF EXISTS {$wpdb->prefix}acad_faculty_course_mapping");
       $wpdb->query("DROP TABLE IF EXISTS {$wpdb->prefix}acad_student");
       $wpdb->query("DROP TABLE IF EXISTS {$wpdb->prefix}acad_student_admission");
-
+			*/
     	$createsql = "CREATE TABLE IF NOT EXISTS {$wpdb->prefix}acad_department(
         DepartmentID INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
         DepartmentAbbreviation VARCHAR(45) UNIQUE NOT NULL,
@@ -477,6 +477,261 @@ if( !class_exists('Activate') ) {
 			      ON UPDATE NO ACTION
 			);";
       dbDelta($createsql);
+
+			$createsql = "CREATE TABLE IF NOT EXISTS {$wpdb->prefix}acad_faculty_request_types(
+				FacultyRequestTypeID INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
+				FacultyRequestTypeName VARCHAR(100) NOT NULL,
+				created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+				updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+				PRIMARY KEY(FacultyRequestTypeID)
+			);";
+			dbDelta($createsql);
+
+		$createsql = "CREATE TABLE IF NOT EXISTS {$wpdb->prefix}acad_faculty_requests(
+				FacultyRequestID INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
+				FacultyID INTEGER UNSIGNED NOT NULL,
+				FacultyRequestSubject VARCHAR(200) NOT NULL,
+				FacultyRequestDetails VARCHAR(500) NOT NULL,
+				FacultyRequestTypeID INTEGER UNSIGNED NOT NULL,
+				FacultyRequestStatus VARCHAR(20) NOT NULL,
+				created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+				updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+				PRIMARY KEY(FacultyRequestID),
+				FOREIGN KEY(FacultyID)
+					REFERENCES {$wpdb->prefix}acad_faculty(FacultyID)
+						ON DELETE NO ACTION
+						ON UPDATE NO ACTION,
+				FOREIGN KEY(FacultyRequestTypeID)
+					REFERENCES {$wpdb->prefix}acad_faculty_request_types(FacultyRequestTypeID)
+						ON DELETE NO ACTION
+						ON UPDATE NO ACTION
+		);";
+		dbDelta($createsql);
+
+			$createsql = "CREATE TABLE IF NOT EXISTS {$wpdb->prefix}acad_faculty_responses(
+				FacultyResponseID INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
+				FacultyRequestID INTEGER UNSIGNED NOT NULL,
+				FacultyID INTEGER UNSIGNED NOT NULL,
+				FacultyResponse VARCHAR(200) NOT NULL,
+				IsApproved BOOL NULL,
+				created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+				updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+				PRIMARY KEY(FacultyResponseID),
+				FOREIGN KEY(FacultyID)
+					REFERENCES {$wpdb->prefix}acad_faculty(FacultyID)
+						ON DELETE NO ACTION
+						ON UPDATE NO ACTION,
+				FOREIGN KEY(FacultyRequestID)
+					REFERENCES {$wpdb->prefix}acad_faculty_requests(FacultyRequestID)
+						ON DELETE NO ACTION
+						ON UPDATE NO ACTION
+			);";
+			dbDelta($createsql);
+
+			$createsql = "CREATE TABLE IF NOT EXISTS {$wpdb->prefix}acad_exam_type(
+				ExamTypeID INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
+				ExamName INTEGER UNSIGNED NULL,
+				MaxMark INTEGER UNSIGNED NULL,
+				created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+				updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+				PRIMARY KEY(ExamTypeID)
+			);";
+			dbDelta($createsql);
+
+			$createsql = "CREATE TABLE IF NOT EXISTS {$wpdb->prefix}acad_exam(
+				ExamID INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
+				FacultyID INTEGER UNSIGNED NOT NULL,
+				CourseID INTEGER UNSIGNED NOT NULL,
+				ExamTypeID INTEGER UNSIGNED NOT NULL,
+				EvaluationType VARCHAR(50) NULL,
+				DateOfExam DATE NULL,
+				Duration DECIMAL NULL,
+				TimeOfExam TIME NULL,
+				Place VARCHAR(20) NULL,
+				created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+				updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+				PRIMARY KEY(ExamID),
+				FOREIGN KEY(ExamTypeID)
+					REFERENCES {$wpdb->prefix}acad_exam_type(ExamTypeID)
+						ON DELETE NO ACTION
+						ON UPDATE NO ACTION,
+				FOREIGN KEY(CourseID)
+					REFERENCES {$wpdb->prefix}acad_course(CourseID)
+						ON DELETE NO ACTION
+						ON UPDATE NO ACTION,
+				FOREIGN KEY(FacultyID)
+					REFERENCES {$wpdb->prefix}acad_faculty(FacultyID)
+						ON DELETE NO ACTION
+						ON UPDATE NO ACTION
+			);";
+			dbDelta($createsql);
+
+			$createsql = "CREATE TABLE IF NOT EXISTS {$wpdb->prefix}acad_student_request_types(
+				StudentRequestTypeID INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
+				StudentRequestTypeName VARCHAR(100) NOT NULL,
+				created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+				updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+				PRIMARY KEY(StudentRequestTypeID)
+			);";
+			dbDelta($createsql);
+
+			$createsql = "CREATE TABLE IF NOT EXISTS {$wpdb->prefix}acad_student_requests(
+				StudentRequestID INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
+			  StudentEnrollmentNumber VARCHAR(20) NOT NULL,
+			  StudentRequestTypeID INTEGER UNSIGNED NOT NULL,
+			  StudentRequestSubject VARCHAR(200) NOT NULL,
+			  StudentRequestDetails VARCHAR(500) NOT NULL,
+			  StudentRequestStatus VARCHAR(20) NOT NULL,
+			  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+			  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+			  PRIMARY KEY(StudentRequestID),
+			  FOREIGN KEY(StudentEnrollmentNumber)
+			    REFERENCES {$wpdb->prefix}acad_student(StudentEnrollmentNumber)
+			      ON DELETE NO ACTION
+			      ON UPDATE NO ACTION,
+			  FOREIGN KEY(StudentRequestTypeID)
+			    REFERENCES {$wpdb->prefix}acad_student_request_types(StudentRequestTypeID)
+			      ON DELETE NO ACTION
+			      ON UPDATE NO ACTION
+		);";
+		dbDelta($createsql);
+
+
+
+			$createsql = "CREATE TABLE IF NOT EXISTS {$wpdb->prefix}acad_feedback_category(
+			 FeedbackCategoryID INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
+			 FeedbackCategoryName VARCHAR(20) NULL,
+			 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+			 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+			 PRIMARY KEY(FeedbackCategoryID)
+		);";
+		dbDelta($createsql);
+
+			$createsql = "CREATE TABLE IF NOT EXISTS {$wpdb->prefix}acad_student_exam_score(
+				StudentExamScoreID INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
+			  EnrollmentID INTEGER UNSIGNED NOT NULL,
+			  ExamID INTEGER UNSIGNED NOT NULL,
+			  StudentExamScore INTEGER UNSIGNED NULL,
+			  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+			  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+			  PRIMARY KEY(StudentExamScoreID),
+			  FOREIGN KEY(ExamID)
+			    REFERENCES {$wpdb->prefix}acad_exam(ExamID)
+			      ON DELETE NO ACTION
+			      ON UPDATE NO ACTION,
+			  FOREIGN KEY(EnrollmentID)
+			    REFERENCES {$wpdb->prefix}acad_enrollment(EnrollmentID)
+			      ON DELETE NO ACTION
+			      ON UPDATE NO ACTION
+		);";
+		dbDelta($createsql);
+
+			$createsql = "CREATE TABLE IF NOT EXISTS {$wpdb->prefix}acad_student_attendance(
+				StudentAttendanceID INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
+			  EnrollmentID INTEGER UNSIGNED NOT NULL,
+			  Date DATE NULL,
+			  IsPresent BOOL NULL,
+			  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+			  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+			  PRIMARY KEY(StudentAttendanceID),
+			  FOREIGN KEY(EnrollmentID)
+			    REFERENCES {$wpdb->prefix}acad_enrollment(EnrollmentID)
+			      ON DELETE NO ACTION
+			      ON UPDATE NO ACTION
+		);";
+		dbDelta($createsql);
+
+			$createsql = "CREATE TABLE IF NOT EXISTS {$wpdb->prefix}acad_log_table(
+				  LogTableID INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
+				  ModifiedBy INTEGER UNSIGNED NULL,
+				  ModifiedOn DATETIME NULL,
+				  CreatedBy INTEGER UNSIGNED NULL,
+				  CreatedOn DATETIME NULL,
+				  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+				  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+				  PRIMARY KEY(LogTableID)
+				);";
+				dbDelta($createsql);
+
+			$createsql = "CREATE TABLE IF NOT EXISTS {$wpdb->prefix}acad_faculty_attendance(
+				FacultyAttendanceID INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
+				FacultyID INTEGER UNSIGNED NOT NULL,
+				CurrentDate DATE NULL,
+				IsPresent BOOL NULL,
+				created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+				updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+				PRIMARY KEY(FacultyAttendanceID),
+				FOREIGN KEY(FacultyID)
+					REFERENCES {$wpdb->prefix}acad_faculty(FacultyID)
+						ON DELETE NO ACTION
+						ON UPDATE NO ACTION
+				);";
+				dbDelta($createsql);
+
+			$createsql = "CREATE TABLE IF NOT EXISTS {$wpdb->prefix}acad_student_feedback(
+				StudentFeedbackID INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
+			  EnrollmentID INTEGER UNSIGNED NOT NULL,
+			  FeedbackCategory1Marks INTEGER UNSIGNED NULL,
+			  Category2Marks INTEGER UNSIGNED NULL,
+			  Category3Marks INTEGER UNSIGNED NULL,
+			  Category4Marks INTEGER UNSIGNED NULL,
+			  Category5Marks INTEGER UNSIGNED NULL,
+			  Category6Marks INTEGER UNSIGNED NULL,
+			  Category7Marks INTEGER UNSIGNED NULL,
+			  Category8Marks INTEGER UNSIGNED NULL,
+			  Category9Marks INTEGER UNSIGNED NULL,
+			  Category10Marks INTEGER UNSIGNED NULL,
+			  Remarks VARCHAR(255) NULL,
+			  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+			  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+			  PRIMARY KEY(StudentFeedbackID),
+			  FOREIGN KEY(EnrollmentID)
+			    REFERENCES {$wpdb->prefix}acad_enrollment(EnrollmentID)
+			      ON DELETE NO ACTION
+			      ON UPDATE NO ACTION
+				);";
+				dbDelta($createsql);
+
+			$createsql = "CREATE TABLE IF NOT EXISTS {$wpdb->prefix}acad_student_sem_academic_record(
+				 StudentAcademicRecordID INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
+				 SemesterID INTEGER UNSIGNED NOT NULL,
+				 StudentEnrollmentNumber VARCHAR(20) NOT NULL,
+				 SemScore INTEGER UNSIGNED NULL,
+				 IsPassed BOOL NULL,
+				 IsDebarred BOOL NULL,
+				 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+				 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+				 PRIMARY KEY(StudentAcademicRecordID),
+			   FOREIGN KEY(StudentEnrollmentNumber)
+				 REFERENCES {$wpdb->prefix}acad_student(StudentEnrollmentNumber)
+					 ON DELETE NO ACTION
+					 ON UPDATE NO ACTION
+				 FOREIGN KEY(SemesterID)
+				   REFERENCES {$wpdb->prefix}acad_semester(SemesterID)
+	 				   ON DELETE NO ACTION
+	 				   ON UPDATE NO ACTION
+				);";
+				dbDelta($createsql);
+
+				$createsql = "CREATE TABLE IF NOT EXISTS {$wpdb->prefix}acad_student_responses(
+				StudentResponseID INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
+				StudentRequestID INTEGER UNSIGNED NOT NULL,
+				FacultyID INTEGER UNSIGNED NOT NULL,
+				StudentResponse VARCHAR(200) NOT NULL,
+				IsApproved BOOL NULL,
+				created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+				updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+				PRIMARY KEY(StudentResponseID),
+				FOREIGN KEY(FacultyID)
+				REFERENCES {$wpdb->prefix}acad_faculty(FacultyID)
+					ON DELETE NO ACTION
+					ON UPDATE NO ACTION,
+				FOREIGN KEY(StudentRequestID)
+				REFERENCES {$wpdb->prefix}acad_student_requests(StudentRequestID)
+					ON DELETE NO ACTION
+					ON UPDATE NO ACTION
+				); ";
+				dbDelta($createsql);
     }
 
 		/*
