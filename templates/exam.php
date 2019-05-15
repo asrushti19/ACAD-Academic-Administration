@@ -45,6 +45,10 @@ use Inc\Api\Callbacks\ExamCallbacks;
 
 		<div id="tab-4" class="tab-pane">
 			<h3>Delete</h3>
+			<?php
+				$exam = new ExamCallbacks();
+				$exam->deleteExams();
+			?>
 		</div>
 	</div>
 </div>

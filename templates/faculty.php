@@ -46,6 +46,10 @@ use Inc\Api\Callbacks\FacultyCallbacks;
 
 		<div id="tab-4" class="tab-pane">
 			<h3>Delete</h3>
+			<?php
+				$faculty = new FacultyCallbacks();
+				$faculty->deleteFaculties();
+			?>
 		</div>
 	</div>
 </div>

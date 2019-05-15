@@ -31,7 +31,7 @@ class StudentAdmissionCallbacks extends BaseController {
 
   public function displayAdmissionDate() {
     $value = esc_attr( get_option('admission_date') );
-    echo '<input type="text" class="regular-text" name="admission_date" value="' . $value . '" placeholder="Admission Date">';
+    echo '<input type="date" class="regular-text" name="admission_date" value="' . $value . '" placeholder="Admission Date">';
   }
 
   public function displayAdmissionYear() {
@@ -46,12 +46,12 @@ class StudentAdmissionCallbacks extends BaseController {
 
   public function displayMeritMarks1() {
     $value = esc_attr( get_option('merit_marks1') );
-    echo '<input type="text" class="regular-text" name="merit_marks1" value="' . $value . '" placeholder="Merit Marks 1">';
+    echo '<input type="number" step="0.01" class="regular-text" name="merit_marks1" value="' . $value . '" placeholder="Merit Marks 1">';
   }
 
   public function displayMeritMarks2() {
     $value = esc_attr( get_option('merit_marks2') );
-    echo '<input type="text" class="regular-text" name="merit_marks2" value="' . $value . '" placeholder="Merit Marks 2">';
+    echo '<input type="number" step="0.01" class="regular-text" name="merit_marks2" value="' . $value . '" placeholder="Merit Marks 2">';
   }
 
   public function displayMeritRank() {
@@ -96,6 +96,46 @@ class StudentAdmissionCallbacks extends BaseController {
       wp_redirect(admin_url('admin.php?page=acad_student_admission'));
 
   }
+
+  public function deleteStudentAdmissions() {
+    if( current_user_can('add_student_admission') || current_user_can('view_student_admissions') ) {
+      global $wpdb;
+
+      $table = $wpdb->prefix.'acad_student';
+      $table = $wpdb->prefix.'acad_student_admission';
+      $rows = $wpdb->get_results( "SELECT * FROM $table" );
+
+      echo '<table class="widefat", width="100%">
+        <thead>
+          <tr>
+            <th>Student Enrollment Number</th>
+            <th>Admission Date</th>
+            <th>Admission Year</th>
+            <th>Admission Type</th>
+            <th>Merit marks 1</th>
+            <th>Merit marks 2</th>
+            <th>Merit Rank</th>
+            <th>Admission Category</th>
+            </tr>
+        </thead>
+        <tbody>';
+          foreach($rows as $row){
+             echo "<tr ><td>".$row->StudentEnrollmentNumber."</td><td>".$row->AdmissionDate."</td><td> ".$row->AdmissionYear."</td><td>".$row->AdmissionType."</td><td> ".$row->MeritMarks1."</td><td>".$row->MeritMarks2."</td><td>".$row->MeritRank."</td><td>".$row->AdmissionCategory."</td></td>\n";
+             echo '<td><form method="post"><input type="submit" name="delete" value="Delete"><input type="hidden" name="student_admission_id" value="'.$row->StudentAdmissionID.'"></form></td>';
+
+           if ($_POST) {
+           global $wpdb;
+               echo "Inside";
+               $table = $wpdb->prefix . 'acad_student_admission';
+               $id = $_POST['student_admission_id'];
+               $res = $wpdb->query("DELETE FROM $table WHERE StudentAdmissionID = ".$id);
+
+                echo "<meta http-equiv='refresh' content='0'>";
+
+           }
+          }
+        }
+      }
 
   public function viewStudentAdmissions() {
     if( current_user_can('add_student_admission') || current_user_can('view_student_admissions') ) {

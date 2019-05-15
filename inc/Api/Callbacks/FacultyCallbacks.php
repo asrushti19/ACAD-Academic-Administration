@@ -110,17 +110,17 @@ class FacultyCallbacks extends BaseController {
 
   public function displayTemporaryAddressPincode() {
     $value = esc_attr( get_option('temporary_address_pincode') );
-    echo '<input type="text" class="regular-text" name="temporary_address_pincode" value="' . $value . '" placeholder="TemporaryAddress Pincode">';
+    echo '<input type="number" step="0.01" class="regular-text" name="temporary_address_pincode" value="' . $value . '" placeholder="TemporaryAddress Pincode">';
   }
 
   public function displayCollegEmail() {
     $value = esc_attr( get_option('college_email') );
-    echo '<input type="email" class="regular-text" name="college_email" value="' . $value . '" placeholder="College email">';
+    echo '<input type="email" onclick="ValidateEmail(this.value) class="regular-text" name="college_email" value="' . $value . '" placeholder="College email">';
   }
 
   public function displayPersonalEmail() {
     $value = esc_attr( get_option('personal_email') );
-    echo '<input type="text" class="regular-text" name="personal_email" value="' . $value . '" placeholder="Personal Email">';
+    echo '<input type="email" onclick="ValidateEmail(this.value) class="regular-text" name="personal_email" value="' . $value . '" placeholder="Personal Email">';
   }
 
   public function displayContactNo() {

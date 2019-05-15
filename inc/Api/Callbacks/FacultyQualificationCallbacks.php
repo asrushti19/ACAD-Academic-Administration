@@ -88,6 +88,41 @@ class FacultyQualificationCallbacks extends BaseController {
       echo "You are not autorized to add a new FacultyQualification";
     }
   }
+  public function deleteFacultyQualifications() {
+    if( current_user_can('add_faculty_qualification') || current_user_can('view_faculty_qualifications') ) {
+      global $wpdb;
+
+      $faculty_table = $wpdb->prefix.'acad_faculty';
+      $table = $wpdb->prefix.'acad_faculty_qualification';
+      $rows = $wpdb->get_results( "SELECT * FROM $table" );
+
+      echo '<table class="widefat", width="100%">
+        <thead>
+          <tr>
+            <th>Faculty ID</th>
+            <th>Qualification Name</th>
+            <th>College Name</th>
+            <th>Qualification Level</th>
+            <th>Year Of Passing</th>
+            </tr>
+        </thead>
+        <tbody>';
+          foreach($rows as $row){
+            echo "<tr ><td>".$row->FacultyID."</td><td>".$row->QualificationName."</td><td> ".$row->CollegeName."</td><td>".$row->QualificationLevel."</td><td> ".$row->YearOfPassing."</td></td>\n";
+            echo '<td><form method="post"><input type="submit" name="delete" value="Delete"><input type="hidden" name="faculty_qualification_id" value="'.$row->FacultyQualificationID.'"></form></td>';
+
+      if ($_POST) {
+      global $wpdb;
+          echo "Inside";
+          $table = $wpdb->prefix . 'acad_faculty_qualification';
+          $id = $_POST['faculty_qualification_id'];
+          $res = $wpdb->query("DELETE FROM $table WHERE FacultyQualificationID = ".$id);
+           echo "<meta http-equiv='refresh' content='0'>";
+
+         }
+       }
+     }
+   }
 
   public function viewFacultyQualifications() {
     if( current_user_can('add_faculty_qualification') || current_user_can('view_faculty_qualifications') ) {

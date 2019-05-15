@@ -2679,7 +2679,7 @@ class Admin extends BaseController
 			),
 			array(
 				'id' => 'exam_name',
-				'title' => 'ExamName',
+				'title' => 'Exam Name',
 				'callback' => array( $this->exam_type_callbacks, 'displayExamName' ),
 				'page' => 'acad_exam_type',
 				'section' => 'acad_exam_type_section',

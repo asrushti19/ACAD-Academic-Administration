@@ -48,6 +48,34 @@ class FeedbackCategoryCallbacks extends BaseController {
       echo "You are not autorized to add a new FeedbackCategory";
     }
   }
+  public function deleteFeedbackCategories() {
+    if( current_user_can('add_feedback_category') || current_user_can('view_feedback_categories') ) {
+      global $wpdb;
+      $table = $wpdb->prefix.'acad_feedback_category';
+      $rows = $wpdb->get_results( "SELECT * FROM $table" );
+
+      echo '<table class="widefat", width="100%">
+        <thead>
+          <tr>
+            <th>FeedbackCategoryName</th>
+            </tr>
+        </thead>
+        <tbody>';
+          foreach($rows as $row){
+            echo "<tr ><td>".$row->FeedbackCategoryName."</td></td>\n";
+            echo '<td><form method="post"><input type="submit" name="delete" value="Delete"><input type="hidden" name="feedback_category_id" value="'.$row->FeedbackCategoryID.'"></form></td>';
+
+          if ($_POST) {
+          global $wpdb;
+              echo "Inside";
+              $table = $wpdb->prefix . 'acad_feedback_category';
+              $id = $_POST['feedback_category_id'];
+              $res = $wpdb->query("DELETE FROM $table WHERE FeedbackCategoryID = ".$id);
+               echo "<meta http-equiv='refresh' content='0'>";
+             }
+         }
+      }
+}
 
   public function viewFeedbackCategories() {
     if( current_user_can('add_feedback_category') || current_user_can('view_feedback_categories') ) {

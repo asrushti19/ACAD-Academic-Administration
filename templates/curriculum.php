@@ -44,6 +44,10 @@ use Inc\Api\Callbacks\CurriculumCallbacks;
 
 		<div id="tab-4" class="tab-pane">
 			<h3>Delete</h3>
+      <?php
+        $curriculums = new CurriculumCallbacks();
+        $curriculums->deleteCurriculums();
+      ?>
 		</div>
 	</div>
 

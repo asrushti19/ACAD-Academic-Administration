@@ -45,6 +45,11 @@ use Inc\Api\Callbacks\ExamTypeCallbacks;
 
 		<div id="tab-4" class="tab-pane">
 			<h3>Delete</h3>
+			<?php
+				$exam_type = new ExamTypeCallbacks();
+				$exam_type->deleteExamTypes();
+			?>
+
 		</div>
 	</div>
 </div>

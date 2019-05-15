@@ -30,17 +30,17 @@ class SemesterCallbacks extends BaseController {
 
   public function displayMaxCredits() {
     $value = esc_attr( get_option('max_credits') );
-    echo '<input type="number" class="regular-text" name="max_credits" value="' . $value . '" placeholder="Maximum Credits">';
+    echo '<input type="number" step="0.01" class="regular-text" name="max_credits" value="' . $value . '" placeholder="Maximum Credits">';
   }
 
   public function displayMinCredits() {
     $value = esc_attr( get_option('min_credits') );
-    echo '<input type="number" class="regular-text" name="min_credits" value="' . $value . '" placeholder="Minimum Credits">';
+    echo '<input type="number" step="0.01" class="regular-text" name="min_credits" value="' . $value . '" placeholder="Minimum Credits">';
   }
 
   public function displayDuration() {
     $value = esc_attr( get_option('duration') );
-    echo '<input type="number" class="regular-text" name="duration" value="' . $value . '" placeholder="Duration (in months)">';
+    echo '<input type="number" step="0.01" class="regular-text" name="duration" value="' . $value . '" placeholder="Duration (in months)">';
   }
 
   public function displaySemesterType() {
@@ -50,7 +50,7 @@ class SemesterCallbacks extends BaseController {
 
   public function displaySemesterNumber() {
     $value = esc_attr( get_option('semester_number') );
-    echo '<input type="number" class="regular-text" name="semester_number" value="' . $value . '" placeholder="Semester Number">';
+    echo '<input type="number" step="0.01" class="regular-text" name="semester_number" value="' . $value . '" placeholder="Semester Number">';
   }
 
   public function displayIsCurrent() {
@@ -83,6 +83,47 @@ class SemesterCallbacks extends BaseController {
       echo "You are not autorized to add a new Semester";
     }
   }
+  public function deleteSemesters() {
+    if( current_user_can('add_semester') || current_user_can('view_semesters')) {
+      global $wpdb;
+      $table = $wpdb->prefix. 'acad_semester';
+      $program_table = $wpdb->prefix . 'acad_program';
+      $rows = $wpdb->get_results( "SELECT * FROM $table" );
+
+      echo '<table class="widefat", width="100%">
+        <thead>
+          <tr>
+            <th>Semester ID</th>
+            <th>Program Code</th>
+            <th>Maximum Credits</th>
+            <th>Minimum Credits</th>
+            <th>Duration(in months)</th>
+            <th>Type</th>
+            <th>Semester Number</th>
+            <th>Is Current</th>
+            </tr>
+        </thead>
+        <tbody>';
+          foreach($rows as $row){
+
+            $program = $wpdb->get_results( "SELECT ProgramCode FROM $program_table WHERE ProgramID = $row->ProgramID" );
+
+            echo "<tr ><td>".$row->SemesterID."</td><td>".$program[0]->ProgramCode."</td><td> ". $row->MaxCredit."</td><td>".$row->MinCredit."</td><td>".$row->DurationInMonths ."</td><td> ".$row->SemesterType."</td><td>".$row->SemesterNumber."</td><td>".$row->IsCurrent."</td></td>\n";
+            echo '<td><form method="post"><input type="submit" name="delete" value="Delete"><input type="hidden" name="semester_id" value="'.$row->SemesterID.'"></form></td>';
+
+          if ($_POST) {
+          global $wpdb;
+              echo "Inside";
+              $table = $wpdb->prefix . 'acad_semester';
+              $id = $_POST['semester_id'];
+              $res = $wpdb->query("DELETE FROM $table WHERE SemesterID = ".$id);
+              //$wpdb->delete( $table, array( 'CourseID' => $id ) );
+               echo "<meta http-equiv='refresh' content='0'>";
+    }
+
+          }
+        }
+      }
 
   public function viewSemesters() {
     if( current_user_can('add_semester') || current_user_can('view_semesters')) {

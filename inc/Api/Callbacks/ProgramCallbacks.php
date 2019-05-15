@@ -93,6 +93,50 @@ class ProgramCallbacks extends BaseController {
     }
   }
 
+  public function deletePrograms() {
+    if( current_user_can('add_program') || current_user_can('program') ) {
+      global $wpdb;
+      $table = $wpdb->prefix.'acad_program';
+      $rows = $wpdb->get_results( "SELECT * FROM $table" );
+
+      $department_table = $wpdb->prefix.'acad_department';
+      $curriculum_table = $wpdb->prefix.'acad_curriculum';
+
+      echo '<table class="widefat", width="100%">
+        <thead>
+          <tr>
+            <th>Department Name</th>
+            <th>Curriculum Code</th>
+            <th>Branch</th>
+            <th>Degree</th>
+            <th>Admission Year</th>
+            <th>Code</th>
+            <th>Abbreviation</th>
+            <th>Launch Year</th>
+            </tr>
+        </thead>
+        <tbody>';
+          foreach($rows as $row){
+
+            $department = $wpdb->get_results( "SELECT * FROM $department_table WHERE DepartmentID = $row->DepartmentID" );
+
+            $curriculum = $wpdb->get_results( "SELECT * FROM $curriculum_table WHERE CurriculumID = $row->CurriculumID" );
+
+            echo "<tr ><td>".$department[0]->DepartmentName."</td><td>".$curriculum[0]->CurriculumCode."</td><td> ".$row->BranchName."</td><td>".$row->DegreeName ."</td><td> ".$row->ProgramAdmissionYear."</td><td>". $row->ProgramCode."</td><td>". $row->ProgramAbbreviation."</td><td>". $row->LaunchYear."</td></td>\n";
+            echo '<td><form method="post"><input type="submit" name="delete" value="Delete"><input type="hidden" name="program_id" value="'.$row->ProgramID.'"></form></td>';
+
+          if ($_POST) {
+          global $wpdb;
+              echo "Inside";
+              $table = $wpdb->prefix . 'acad_program';
+              $id = $_POST['program_id'];
+              $res = $wpdb->query("DELETE FROM $table WHERE ProgramID = ".$id);
+
+               echo "<meta http-equiv='refresh' content='0'>";
+             }
+}
+          }
+}
   public function viewPrograms() {
     if( current_user_can('add_program') || current_user_can('program') ) {
       global $wpdb;

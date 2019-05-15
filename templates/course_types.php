@@ -43,6 +43,10 @@ use Inc\Api\Callbacks\CourseTypesCallbacks;
 
 		<div id="tab-4" class="tab-pane">
 			<h3>Delete</h3>
+      <?php
+      $types = new CourseTypesCallbacks();
+      $types->deleteCourseTypes();
+      ?>
 		</div>
 	</div>
 </div>

@@ -46,6 +46,10 @@ use Inc\Api\Callbacks\FacultyRequestsCallbacks;
 
 		<div id="tab-4" class="tab-pane">
 			<h3>Delete</h3>
+			<?php
+				$faculty_requests = new FacultyRequestsCallbacks();
+				$faculty_requests->deleteFacultyRequestss();
+			?>
 		</div>
 	</div>
 </div>

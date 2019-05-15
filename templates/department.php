@@ -46,6 +46,10 @@ use Inc\Api\Callbacks\DepartmentCallbacks;
 
 		<div id="tab-4" class="tab-pane">
 			<h3>Delete</h3>
+			<?php
+				$department = new DepartmentCallbacks();
+				$department->deleteDepartments();
+			?>
 		</div>
 	</div>
 </div>

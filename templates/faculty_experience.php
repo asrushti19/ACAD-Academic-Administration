@@ -46,6 +46,10 @@ use Inc\Api\Callbacks\FacultyExperienceCallbacks;
 
 		<div id="tab-4" class="tab-pane">
 			<h3>Delete</h3>
+			<?php
+				$faculty_experience = new FacultyExperienceCallbacks();
+				$faculty_experience->deleteFacultyExperiences();
+			?>
 		</div>
 	</div>
 </div>

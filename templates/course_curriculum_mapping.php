@@ -42,6 +42,10 @@ use Inc\Api\Callbacks\CourseCurriculumMappingCallbacks;
 
 		<div id="tab-4" class="tab-pane">
 			<h3>Delete</h3>
+      <?php
+      $ccm = new CourseCurriculumMappingCallbacks();
+      $ccm->deleteCcms();
+      ?>
 		</div>
 	</div>
 </div>

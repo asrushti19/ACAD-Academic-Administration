@@ -37,7 +37,35 @@ class CourseTypesCallbacks extends BaseController {
       echo "You are not autorized to add a new Course Type";
     }
   }
+  public function deleteCourseTypes() {
+    if( current_user_can('add_course_types') || current_user_can('view_course_types') ) {
+      global $wpdb;
+      $table = $wpdb->prefix.'acad_course_types';
+      $rows = $wpdb->get_results( "SELECT * FROM $table" );
 
+      echo '<table class="widefat", width="100%">
+        <thead>
+          <tr>
+            <th>Course Types</th>
+          </tr>
+        </thead>
+        <tbody>';
+          foreach($rows as $row){
+            echo "<tr ><td>".$row->CourseTypeName."</td></td>\n";
+            echo '<td><form method="post"><input type="submit" name="delete" value="Delete"><input type="hidden" name="course_type_id" value="'.$row->CourseTypeID.'"></form></td>';
+
+            if ($_POST) {
+            global $wpdb;
+                echo "Inside";
+                $table = $wpdb->prefix . 'acad_course_types';
+                $id = $_POST['course_type_id'];
+                $res = $wpdb->query("DELETE FROM $table WHERE CourseTypeID = ".$id);
+                 echo "<meta http-equiv='refresh' content='0'>";
+
+          }
+        }
+      }
+    }
   public function viewCourseTypes() {
     if( current_user_can('add_course_types') || current_user_can('view_cours_types') ) {
       global $wpdb;

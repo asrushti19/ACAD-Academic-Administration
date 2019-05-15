@@ -45,6 +45,11 @@ use Inc\Api\Callbacks\FeedbackCategoryCallbacks;
 
 		<div id="tab-4" class="tab-pane">
 			<h3>Delete</h3>
+			<?php
+				$feedback_category = new FeedbackCategoryCallbacks();
+				$feedback_category->deleteFeedbackCategories();
+			?>
+
 		</div>
 	</div>
 </div>

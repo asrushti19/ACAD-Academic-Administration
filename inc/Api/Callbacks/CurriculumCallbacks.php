@@ -23,7 +23,7 @@ class CurriculumCallbacks extends BaseController {
 
   public function displayTotalCredits() {
     $value = esc_attr( get_option('total_credits') );
-    echo '<input type="text" class="regular-text" name="total_credits" value="' . $value . '" placeholder="Total credits">';
+    echo '<input type="number" step="0.01" class="regular-text" name="total_credits" value="' . $value . '" placeholder="Total credits">';
   }
 
   public function addCurriculum() {
@@ -44,7 +44,37 @@ class CurriculumCallbacks extends BaseController {
       echo "You are not authorized to add a new curriculum";
     }
   }
+  public function deleteCurriculums() {
+    if( current_user_can('add_curriculum') || current_user_can('view_curriculum') ) {
+      global $wpdb;
+      $table = $wpdb->prefix.'acad_curriculum';
+      $rows = $wpdb->get_results( "SELECT * FROM $table" );
 
+      echo '<table class="widefat", width="100%">
+        <thead>
+          <tr>
+            <th>Code</th>
+            <th>Total Credits</th>
+            </tr>
+        </thead>
+        <tbody>';
+          foreach($rows as $row){
+            echo "<tr ><td>".$row->CurriculumCode."</td><td>".$row->TotalCredits. "</td></td>\n";
+            echo '<td><form method="post"><input type="submit" name="delete" value="Delete"><input type="hidden" name="curriculum_id" value="'.$row->CurriculumID.'"></form></td>';
+
+
+          if ($_POST) {
+          global $wpdb;
+              echo "Inside";
+              $table = $wpdb->prefix . 'acad_curriculum';
+              $id = $_POST['curriculum_id'];
+              $res = $wpdb->query("DELETE FROM $table WHERE CurriculumID = ".$id);
+               echo "<meta http-equiv='refresh' content='0'>";
+
+          }
+        }
+      }
+    }
   public function viewCurriculums() {
     if( current_user_can('add_curriculum') || current_user_can('view_curriculum') ) {
       global $wpdb;

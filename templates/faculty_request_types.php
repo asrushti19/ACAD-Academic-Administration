@@ -46,6 +46,10 @@ use Inc\Api\Callbacks\FacultyRequestTypesCallbacks;
 
 		<div id="tab-4" class="tab-pane">
 			<h3>Delete</h3>
+			<?php
+				$faculty_request_types = new FacultyRequestTypesCallbacks();
+				$faculty_request_types->deleteFacultyRequestTypess();
+			?>
 		</div>
 	</div>
 </div>

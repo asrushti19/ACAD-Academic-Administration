@@ -111,6 +111,48 @@ class ExamCallbacks extends BaseController {
     }
   }
 
+  public function deleteExams() {
+    if( current_user_can('add_exam') || current_user_can('view_exams') ) {
+      global $wpdb;
+
+      $table = $wpdb->prefix. 'acad_faculty';
+      $table = $wpdb->prefix. 'acad_course';
+      $table = $wpdb->prefix. 'acad_exam_type';
+      $table = $wpdb->prefix.'acad_exam';
+      $rows = $wpdb->get_results( "SELECT * FROM $table" );
+
+			echo '<table class="widefat", width="100%">
+	  		<thead>
+	    		<tr>
+	      		<th>Faculty ID</th>
+            <th>Course ID</th>
+            <th>ExamType ID</th>
+            <th>Evaluation Type</th>
+            <th>Date Of Exam</th>
+            <th>Duration</th>
+            <th>Time Of Exam</th>
+	      		<th>Place</th>
+            </tr>
+	  		</thead>
+	  		<tbody>';
+	      	foreach($rows as $row){
+	          echo "</td><td>".$row->FacultyID."</td><td>".$row->CourseID."</td><td>".$row->ExamTypeID."</td><td>".$row->EvaluationType."</td><td>".$row->DateOfExam."</td><td>".$row->Duration."</td><td>".$row->TimeOfExam."</td><td>".$row->Place."</td></td>\n";
+            echo '<td><form method="post"><input type="submit" name="delete" value="Delete"><input type="hidden" name="exam_id" value="'.$row->ExamID.'"></form></td>';
+
+        if ($_POST) {
+        global $wpdb;
+            echo "Inside";
+            $table = $wpdb->prefix . 'acad_exam';
+            $id = $_POST['exam_id'];
+            $res = $wpdb->query("DELETE FROM $table WHERE ExamID = ".$id);
+
+             echo "<meta http-equiv='refresh' content='0'>";
+
+          }
+        }
+      }
+    }
+
   public function viewExams() {
     if( current_user_can('add_exam') || current_user_can('view_exams') ) {
       global $wpdb;

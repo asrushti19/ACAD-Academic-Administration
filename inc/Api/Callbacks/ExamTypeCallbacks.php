@@ -16,14 +16,13 @@ class ExamTypeCallbacks extends BaseController {
   }
 
   public function displayExamName() {
-    //echo "Inside ";
     $value = esc_attr( get_option('exam_name') );
     echo '<input type="text" class="regular-text" name="exam_name" value="' . $value . '" placeholder="Exam Name">';
   }
 
   public function displayMaxMark() {
     $value = esc_attr( get_option('max_mark') );
-    echo '<input type="text" class="regular-text" name="max_mark" value="' . $value . '" placeholder="Max Mark">';
+    echo '<input type="number" step="0.01" class="regular-text" name="max_mark" value="' . $value . '" placeholder="Max Mark">';
   }
    public function displayExamTypeUpdateListAction() {
       echo '<input type="hidden" name="action" value="update_exam_type_getID_action">';
@@ -53,7 +52,36 @@ class ExamTypeCallbacks extends BaseController {
       echo "You are not autorized to add a new Exam";
     }
   }
+  public function deleteExamTypes() {
+    if( current_user_can('add_exam_type') || current_user_can('view_exam_types') ) {
+      global $wpdb;
+      $table = $wpdb->prefix.'acad_exam_type';
+      $rows = $wpdb->get_results( "SELECT * FROM $table" );
 
+			echo '<table class="widefat", width="100%">
+	  		<thead>
+	    		<tr>
+	      		<th>Exam Name</th>
+	      		<th>Max Marks</th>
+            </tr>
+	  		</thead>
+	  		<tbody>';
+	      	foreach($rows as $row){
+	          echo "<tr ><td>".$row->ExamName."</td><td>".$row->MaxMark."</td></td>\n";
+            echo '<td><form method="post"><input type="submit" name="delete" value="Delete"><input type="hidden" name="exam_type_id" value="'.$row->ExamTypeID.'"></form></td>';
+
+          if ($_POST) {
+          global $wpdb;
+              echo "Inside";
+              $table = $wpdb->prefix . 'acad_exam_type';
+              $id = $_POST['exam_type_id'];
+              $res = $wpdb->query("DELETE FROM $table WHERE ExamTypeID = ".$id);
+               echo "<meta http-equiv='refresh' content='0'>";
+
+          }
+        }
+      }
+    }
   public function viewExamTypes() {
     if( current_user_can('add_exam_type') || current_user_can('view_exam_types') ) {
       global $wpdb;
@@ -63,7 +91,7 @@ class ExamTypeCallbacks extends BaseController {
 			echo '<table class="widefat", width="100%">
 	  		<thead>
 	    		<tr>
-	      		<th>Name</th>
+	      		<th>Exam Name</th>
 	      		<th>Max Marks</th>
             </tr>
 	  		</thead>

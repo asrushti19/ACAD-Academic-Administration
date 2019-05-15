@@ -49,6 +49,36 @@ class FacultyRequestTypesCallbacks extends BaseController {
     }
   }
 
+  public function deleteFacultyRequestTypess() {
+    if( current_user_can('add_faculty_request_types') || current_user_can('view_faculty_request_typess') ) {
+      global $wpdb;
+      $table = $wpdb->prefix.'acad_faculty_request_types';
+      $rows = $wpdb->get_results( "SELECT * FROM $table" );
+
+      echo '<table class="widefat", width="100%">
+        <thead>
+          <tr>
+            <th>Faculty Request Type Name</th>
+            </tr>
+        </thead>
+        <tbody>';
+          foreach($rows as $row){
+            echo "<tr ><td>".$row->FacultyRequestTypeName."</td></td>\n";
+            echo '<td><form method="post"><input type="submit" name="delete" value="Delete"><input type="hidden" name="faculty_request_type_id" value="'.$row->FacultyRequestTypeID.'"></form></td>';
+
+          if ($_POST) {
+          global $wpdb;
+              echo "Inside";
+              $table = $wpdb->prefix . 'acad_faculty_request_types';
+              $id = $_POST['faculty_request_type_id'];
+              $res = $wpdb->query("DELETE FROM $table WHERE FacultyRequestTypeID = ".$id);
+
+               echo "<meta http-equiv='refresh' content='0'>";
+            }
+         }
+       }
+     }
+
   public function viewFacultyRequestTypess() {
     if( current_user_can('add_faculty_request_types') || current_user_can('view_faculty_request_typess') ) {
       global $wpdb;

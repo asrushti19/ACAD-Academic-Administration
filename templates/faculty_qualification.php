@@ -46,6 +46,10 @@ use Inc\Api\Callbacks\FacultyQualificationCallbacks;
 
 		<div id="tab-4" class="tab-pane">
 			<h3>Delete</h3>
+			<?php
+				$faculty_qualification = new FacultyQualificationCallbacks();
+				$faculty_qualification->deleteFacultyQualifications();
+			?>
 		</div>
 	</div>
 </div>

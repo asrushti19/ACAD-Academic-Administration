@@ -140,12 +140,12 @@ class StudentCallbacks extends BaseController {
 
   public function displayCollegeEmail() {
     $value = esc_attr( get_option('college_email') );
-    echo '<input type="text" class="regular-text" name="college_email" value="' . $value . '" placeholder="College Email">';
+    echo '<input type="email" onclick="ValidateEmail(this.value) class="regular-text" name="college_email" value="' . $value . '" placeholder="College Email">';
   }
 
   public function displayPersonalEmail() {
     $value = esc_attr( get_option('personal_email') );
-    echo '<input type="text" class="regular-text" name="personal_email" value="' . $value . '" placeholder="Perspnal Email">';
+    echo '<input type="email" onclick="ValidateEmail(this.value) class="regular-text" name="personal_email" value="' . $value . '" placeholder="Perspnal Email">';
   }
 
   public function displayCaste() {
