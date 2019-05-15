@@ -48,7 +48,7 @@ use Inc\Api\Callbacks\DepartmentCallbacks;
 			<h3>Delete</h3>
 			<?php
 				$department = new DepartmentCallbacks();
-				$department->deleteDepartments();
+				$department->deleteDepartment();
 			?>
 		</div>
 	</div>
