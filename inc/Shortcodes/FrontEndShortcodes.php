@@ -384,6 +384,74 @@ class FrontEndShortcodes {
     echo '</form>';
 
   }
+/*Will display the personal profile of students*/
+  public function studentPersonalProfile(){
+    global $wpdb;
+
+    $current_user = wp_get_current_user();
+    $student_enrollment_number = $current_user->user_login;
+    $student_table = $wpdb->prefix . 'acad_student';
+
+    if($_POST) {
+
+      //updating goes here
+    }
+
+    else {
+      $student = $wpdb->get_results( "SELECT * FROM $student_table WHERE StudentEnrollmentNumber = " .$student_enrollment_number );
+
+      echo '<form method="post"><table border="0"><tr><td> StudentEnrollmentNumber: </td><td><label>'.$student[0]->StudentEnrollmentNumber.' </label></td>
+      <td> First Name : </td> <td><input type ="text" name = "first_name" value = "' .$student[0]->FirstName.'"></td></tr>
+      <td> Middle Name : </td> <td><input type ="text" name = "middle_name" value = "' .$student[0]->MiddleName.'"></td>
+      <td> Last Name : </td> <td><input type ="text" name = "last_name" value = "' .$student[0]->LastName.'"></td></tr>
+      <td> Mothers Name : </td> <td><input type ="text" name = "mother_name" value = "' .$student[0]->MotherName.'"></td>
+      <td> Gender : </td> <td><input type ="text" name = "gender" value = "' .$student[0]->Gender.'"></td>
+      <tr><td> Date of Birth : </td> <td><label>' .$student[0]->Gender.'</label></td>
+      <td> Blood Group : </td> <td><label>' .$student[0]->BloodGroup.'</label></td></tr>
+      <tr><td><b> Temporary Addresss Details : </b></td></tr>
+      <td> Address Line 1 : </td> <td><input type ="text" name = "temp_addr_line_1" value = "' .$student[0]->TempAddrLine1.'"></td></tr>
+      <td> Taluka : </td> <td><input type ="text" name = "temp_addr_taluka" value = "' .$student[0]->TempAddrTaluka.'"></td>
+      <td> District : </td> <td><input type ="text" name = "temp_addr_district" value = "' .$student[0]->TempAddrDistrict.'"></td></tr>
+      <td> Country : </td> <td><input type ="text" name = "temp_addr_country" value = "' .$student[0]->TempAddrCountry.'"></td>
+      <td> State : </td> <td><input type ="text" name = "temp_addr_state" value = "' .$student[0]->TempAddrState.'"></td></tr>
+      <td> Pincode : </td> <td><input type ="text" name = "temp_addr_pincode" value = "' .$student[0]->TempAddrPostalCode.'"></td>
+      <tr><td><b> Permanent Addresss Details : </b></td></tr>
+      <td> Address Line 1 : </td> <td><input type ="text" name = "perm_addr_line_1" value = "' .$student[0]->PermAddrLine1.'"></td></tr>
+      <td> Taluka : </td> <td><input type ="text" name = "perm_addr_taluka" value = "' .$student[0]->PermAddrTaluka.'"></td>
+      <td> District : </td> <td><input type ="text" name = "perm_addr_district" value = "' .$student[0]->PermAddrDistrict.'"></td></tr>
+      <td> Country : </td> <td><input type ="text" name = "perm_addr_country" value = "' .$student[0]->PermAddrCountry.'"></td>
+      <td> State : </td> <td><input type ="text" name = "perm_addr_state" value = "' .$student[0]->PermAddrState.'"></td></tr>
+      <td> Pincode : </td> <td><input type ="text" name = "perm_addr_pincode" value = "' .$student[0]->PermAddrPincode.'"></td>
+      <tr><td><b> Contact Details : </b></td></tr>
+      <td> Permanent Address Contact : </td> <td><input type ="text" name = "perm_addr_contact_no" value = "' .$student[0]->PermAddrContactNo.'"></td></tr>
+      <td> Personal Contact : </td> <td><input type ="text" name = "personal_contact_no" value = "' .$student[0]->PersonalContactNo.'"></td>
+      <td> Emergency Contact : </td> <td><input type ="text" name = "emergency_contact_no" value = "' .$student[0]->EmergencyContactNo.'"></td></tr>
+      <tr><td><b> Email Address Details : </b></td></tr>
+      <td> College Email : </td> <td><input type ="text" name = "college_email" value = "' .$student[0]->CollegeEmail.'"></td>
+      <td> Personal Mail : </td> <td><input type ="text" name = "personal_email" value = "' .$student[0]->PersonalEmail.'"></td></tr>
+      <tr><td><b> Caste Details : </b></td></tr>
+      <td> Caste : </td> <td><input type ="text" name = "caste" value = "' .$student[0]->Caste.'"></td>
+      <td> Religion : </td> <td><input type ="text" name = "religion" value = "' .$student[0]->Religion.'"></td></tr>
+      <td> Caste Category : </td> <td><input type ="text" name = "caste_category" value = "' .$student[0]->CasteCategory.'"></td></tr>
+      <td> Is Handicap : </td> <td><input type ="text" name = "is_handicapped" value = "' .$student[0]->IsHandicapped.'"></td>
+      <tr><td><b> Adhaar Details : </b></td>
+      <td> Addhar ID : </td> <td><label>' .$student[0]->AadharID.'</label></td></tr>
+      <td> Photo : </td> <td><input type ="text" name = "photo" value = "' .$student[0]->Photo.'"></td></tr>
+      <tr><td><b> Bank Account Details Details : </b></td></tr>
+      <td> Bank Account Number : </td> <td><input type ="text" name = "bank_account_number" value = "' .$student[0]->BankAccountNumber.'"></td>
+      <td> Bank Name : </td> <td><input type ="text" name = "bank_name" value = "' .$student[0]->BankName.'"></td></tr>
+      <td> Bank Branch Name : </td> <td><input type ="text" name = "bank_branch_name" value = "' .$student[0]->BankBranchName.'"></td>
+      <td> Bank Branch Code : </td> <td><input type ="text" name = "bank_branch_code" value = "' .$student[0]->BankBranchCode.'"></td>  ';
+
+
+
+
+      echo '</tr></table></form>';
+
+    }
+
+
+  }
 
 }
 
